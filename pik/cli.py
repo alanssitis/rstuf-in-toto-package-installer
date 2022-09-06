@@ -19,7 +19,7 @@ from tuf.ngclient import Updater, UpdaterConfig
 BASE_URL = "http://172.105.77.212:8080"
 DOWNLOAD_URL = "https://github.com/kaprien/demo-package/releases/download/"
 DOWNLOAD_DIR = "./downloads"
-METADATA_DIR = f"{Path.home()}/.local/share/python-tuf-client-example"
+METADATA_DIR = f"{Path.home()}/.local/share/demo-pik"
 PIK_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -36,10 +36,10 @@ def _init() -> None:
         shutil.copy(
             f"{PIK_DIR}/1.root.json", f"{METADATA_DIR}/root.json"
         )
-        print(f"Added trusted root in {METADATA_DIR}")
+        click.echo(f"Added trusted root in {METADATA_DIR}")
 
     else:
-        print(f"Found trusted root in {METADATA_DIR}")
+        click.echo(f"Found trusted root in {METADATA_DIR}")
 
 
 def _download(target: str) -> bool:
@@ -70,16 +70,16 @@ def _download(target: str) -> bool:
 
         path = updater.find_cached_target(info)
         if path:
-            print(f"Target already available")
+            click.echo(f"Target already available")
             return True
 
         path = updater.download_target(info)
         short_name = os.path.join(DOWNLOAD_DIR, path.split('%2F')[-1])
         os.symlink(path, short_name)
-        print(f"Target downloaded and available in {short_name}")
+        click.echo(f"Target downloaded and available in {short_name}")
 
     except (OSError, RepositoryError, DownloadError) as e:
-        print(f"Failed to download target {target}: {e}")
+        click.echo(f"Failed to download target {target}: {e}")
         return False
 
     return True
@@ -125,11 +125,14 @@ def download(package_name):
         else:
             query_data = query_latest.json()
             for asset in query_data.get("assets"):
-                if asset.get("content_type") == "application/gzip":
+                if asset.get("content_type") == "application/gzip" or "application/x-gzip":
                     full_url = asset.get("browser_download_url")
                     package_to_download = "/".join(full_url.split("/")[-2:])
+                    click.echo(f"Found version: {package_to_download.split('/')[0]}")
                     if not _download(package_to_download):
-                        raise click.ClickException("{package_name} not found.")
+                        raise click.ClickException(
+                            f"{package_name} not found. "
+                            f"Package {package_to_download} looks not signed.")
                     break
 
     else:
