@@ -111,11 +111,11 @@ def cli(verbose):
 @click.argument('package_name')
 def download(package_name):
     _init()
-
+    name = package_name.split("==")[0]
     if "==" not in package_name:
         try:
             query_latest = requests.get(
-                "https://api.github.com/repos/KAPRIEN/demo-package/releases/latest"
+                f"https://api.github.com/repos/KAPRIEN/{name}/releases/latest"
             )
         except requests.exceptions.ConnectionError() as err:
             raise click.ClickException(str(err))
@@ -135,13 +135,12 @@ def download(package_name):
                     if not _download(package_to_download):
                         raise click.ClickException(
                             f"{package_name} not found. "
-                            f"Package {package_to_download} looks not signed.")
+                            f"Package {package_to_download} not signed.")
                     break
 
     else:
         version = package_name.split("==")[1]
-        name = package_name.split("==")[0]
-        package_to_download = f"v{version}/{name}-{version}.tar.gz"
+        package_to_download = f"v{version}/{name.replace('-', '_')}-{version}.tar.gz"
         if not _download(package_to_download):
             raise click.ClickException(f"{name} version {version} not found.")
 
