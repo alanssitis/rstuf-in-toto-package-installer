@@ -125,7 +125,10 @@ def download(package_name):
         else:
             query_data = query_latest.json()
             for asset in query_data.get("assets"):
-                if asset.get("content_type") == "application/gzip" or "application/x-gzip":
+                if (
+                    asset.get("content_type") == "application/gzip"
+                    or asset.get("content_type") == "application/x-gzip"
+                ):
                     full_url = asset.get("browser_download_url")
                     package_to_download = "/".join(full_url.split("/")[-2:])
                     click.echo(f"Found version: {package_to_download.split('/')[0]}")
