@@ -4,7 +4,6 @@
 # Copyright 2012 - 2017, New York University and the TUF contributors
 # SPDX-License-Identifier: MIT OR Apache-2.0
 
-import argparse
 import logging
 import os
 import shutil
@@ -13,12 +12,13 @@ from pathlib import Path
 import click
 import requests
 from tuf.api.exceptions import DownloadError, RepositoryError
-from tuf.ngclient import Updater, UpdaterConfig
+from tuf.ngclient.updater import Updater
+from tuf.ngclient.config import UpdaterConfig
 
 # constants
-BASE_URL = "http://172.105.77.212:8080"
-DOWNLOAD_URL = "https://github.com/kaprien/demo-package/releases/download/"
-DOWNLOAD_DIR = "./downloads"
+BASE_URL = "http://127.0.0.1:8080/"
+DOWNLOAD_URL = "http://localhost:8000/"
+DOWNLOAD_DIR = "./client"
 METADATA_DIR = f"{Path.home()}/.local/share/demo-pik"
 PIK_DIR = os.path.dirname(os.path.abspath(__file__))
 
